@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎙️ MELO Voice Cloner</title>
+  <link rel="stylesheet" href="styles1.css" />
+</head>
+
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">🎙️ MELO Voice Cloner</h2>
+      </div>
+
+      <div class="input-group">
+        <label for="language" class="input-label">🌐 Language</label>
+        <select id="language" class="select-input">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="it">Italian</option>
+          <option value="pt">Portuguese</option>
+          <option value="pl">Polish</option>
+          <option value="tr">Turkish</option>
+          <option value="ru">Russian</option>
+          <option value="nl">Dutch</option>
+          <option value="cs">Czech</option>
+          <option value="ar">Arabic</option>
+          <option value="zh-cn">Chinese</option>
+          <option value="ja">Japanese</option>
+          <option value="hu">Hungarian</option>
+          <option value="ko">Korean</option>
+          <option value="hi">Hindi</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="refAudio" class="input-label" data-tooltip="Upload a sample of the voice you want to clone">
+          🔼 Reference Audio
+        </label>
+        <input type="file" id="refAudio" accept="audio/*" required class="file-input" />
+      </div>
+
+      <div class="input-group">
+        <label for="modeSelect" class="input-label" data-tooltip="Choose how you want to use the voice cloning">
+          🧠 Mode
+        </label>
+        <select id="modeSelect" class="select-input">
+          <option value="text">Clone My Text</option>
+          <option value="clone-my-audio">Clone My Audio</option>
+          <option value="llmText">Ask LLM (Text)</option>
+          <option value="llmAudio">Ask LLM (Audio)</option>
+        </select>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">🎙️ MELO AI Voice Cloner</h1>
+          <p class="card-subtitle">Transform your voice into a digital masterpiece — Clone it with cutting-edge AI
+            models</p>
+        </div>
+
+        <form id="voiceForm" class="form">
+          <div id="textInputContainer">
+            <label for="userText" class="input-label">✍️ Enter Text or Question</label>
+            <textarea id="userText" class="textarea"
+              placeholder="Write something here that you want to hear in your cloned voice..."></textarea>
+          </div>
+
+          <div id="recordContainer" class="hidden">
+            <label class="input-label">🎤 Record Your Question</label>
+            <button type="button" id="recordBtn" class="record-btn">
+              <span id="recordBtnText">Start Recording</span>
+            </button>
+            <p id="recordStatus" class="record-status"></p>
+            <div id="audioVisualizer" class="hidden">
+              <canvas id="visualizer" width="300" height="60"></canvas>
+            </div>
+          </div>
+
+          <div id="spinner" class="spinner hidden"></div>
+
+          <button type="submit" class="submit-btn">
+            🚀 Generate Cloned Voice
+          </button>
+        </form>
+
+        <!-- Output -->
+        <div id="output" class="output ">
+          <h2 class="output-title">🎧 Generated Voice</h2>
+          <audio id="audioPlayer" controls class="audio-player"></audio>
+          <a id="downloadBtn" class="download-btn" download="melo-cloned-voice.wav">⬇️ Download
+            Cloned Audio</a>
+        </div>
+      </div>
+    </main>
+  </div>
+<script>
+const BASE_URL = 'http://localhost:8000';
+const modeSelect = document.getElementById("modeSelect");
+const textInputContainer = document.getElementById("textInputContainer");
+const recordContainer = document.getElementById("recordContainer");
+const recordBtn = document.getElementById("recordBtn");
+const recordBtnText = document.getElementById("recordBtnText");
+const recordStatus = document.getElementById("recordStatus");
+const voiceForm = document.getElementById("voiceForm");
+const spinner = document.getElementById("spinner");
+const output = document.getElementById("output");
+const downloadBtn = document.getElementById("downloadBtn");
+const audioPlayer = document.getElementById("audioPlayer");
+const visualizer = document.getElementById("visualizer");
+const audioVisualizer = document.getElementById("audioVisualizer");
+const refAudio = document.getElementById("refAudio");
+const userText = document.getElementById("userText");
+const languageSelect = document.getElementById("language");
+
+let recordedBlob = null;
+let mediaRecorder = null;
+let audioContext = null;
+let analyser = null;
+let isRecording = false;
+let animationFrame = null;
+let stream = null;
+
+// Prevent default form submission
+voiceForm.setAttribute("novalidate", "novalidate");
+
+// Mode change handler
+modeSelect.addEventListener("change", () => {
+  const selected = modeSelect.value;
+  textInputContainer.classList.toggle("hidden", selected === "clone-my-audio" || selected === "llmAudio");
+  recordContainer.classList.toggle("hidden", selected !== "clone-my-audio" && selected !== "llmAudio");
+  output.classList.add("hidden");
+  audioPlayer.src = "";
+  audioPlayer.style.display = "none";
+  downloadBtn.style.display = "none";
+  console.log(`[${new Date().toISOString()}] Mode changed to: ${selected}`);
+});
+
+// Audio visualizer setup
+function initAudioVisualizer(stream) {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const source = audioContext.createMediaStreamSource(stream);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 256;
+  source.connect(analyser);
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  const ctx = visualizer.getContext("2d");
+
+  function draw() {
+    if (!isRecording) return;
+    animationFrame = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
+    ctx.clearRect(0, 0, visualizer.width, visualizer.height);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillRect(0, 0, visualizer.width, visualizer.height);
+    const barWidth = (visualizer.width / bufferLength) * 2.5;
+    let x = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      const barHeight = dataArray[i] / 2;
+      ctx.fillStyle = `rgb(245, ${197 + i}, ${24 + i})`;
+      ctx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
+      x += barWidth + 1;
+    }
+  }
+  draw();
+}
+
+// Toggle recording
+async function toggleRecording() {
+  if (isRecording) {
+    isRecording = false;
+    recordBtnText.textContent = "Start Recording";
+    recordBtn.classList.remove("recording");
+    recordStatus.textContent = "✅ Recording complete.";
+    if (mediaRecorder) mediaRecorder.stop();
+    if (stream) stream.getTracks().forEach(track => track.stop());
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    audioVisualizer.classList.add("hidden");
+    console.log(`[${new Date().toISOString()}] Recording stopped`);
+  } else {
+    try {
+      recordStatus.textContent = "🎙️ Recording... speak now.";
+      recordBtnText.textContent = "Stop Recording";
+      recordBtn.classList.add("recording");
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const chunks = [];
+      mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        recordedBlob = new Blob(chunks, { type: 'audio/wav' });
+        console.log(`[${new Date().toISOString()}] Recorded blob size: ${recordedBlob.size}`);
+      };
+      mediaRecorder.start();
+      isRecording = true;
+      audioVisualizer.classList.remove("hidden");
+      initAudioVisualizer(stream);
+      setTimeout(() => {
+        if (isRecording) toggleRecording();
+      }, 10000);
+      console.log(`[${new Date().toISOString()}] Recording started`);
+    } catch (err) {
+      recordStatus.textContent = "❌ Error accessing microphone.";
+      console.error("Recording error:", err);
+      showNotification("Microphone access failed.", "error");
+    }
+  }
+}
+
+// Form submission handler
+voiceForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  console.log(`[${new Date().toISOString()}] Form submission intercepted`);
+
+  if (!refAudio.files[0]) {
+    showNotification("Reference audio is required.", "error");
+    return;
+  }
+
+  const formData = new FormData();
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const language = languageSelect.value;
+  const mode = modeSelect.value;
+  formData.append("refAudio", refAudio.files[0], `ref_audio_${language}_${timestamp}.wav`);
+  formData.append("language", language);
+  formData.append("outputFilename", `cloned_${mode}_${language}_${timestamp}.wav`);
+
+  let url;
+  if (mode === "text") {
+    if (!userText.value.trim()) {
+      showNotification("Please enter text.", "error");
+      return;
+    }
+    formData.append("userText", userText.value);
+    url = `${BASE_URL}/clone-text/`;
+  } else if (mode === "llmText") {
+    if (!userText.value.trim()) {
+      showNotification("Please enter text.", "error");
+      return;
+    }
+    formData.append("userText", userText.value);
+    url = `${BASE_URL}/clone-llm-text/`;
+  } else if (mode === "clone-my-audio") {
+    if (!recordedBlob) {
+      showNotification("Please record audio first.", "error");
+      return;
+    }
+    formData.append("audioFileInput", recordedBlob, `input_audio_${language}_${timestamp}.wav`);
+    url = `${BASE_URL}/clone-my-audio/`;
+  } else if (mode === "llmAudio") {
+    if (!recordedBlob) {
+      showNotification("Please record audio first.", "error");
+      return;
+    }
+    formData.append("audioFileInput", recordedBlob, `input_audio_${language}_${timestamp}.wav`);
+    url = `${BASE_URL}/clone-llm-audio/`;
+  }
+
+  spinner.classList.remove("hidden");
+  output.classList.add("hidden");
+  audioPlayer.src = "";
+  audioPlayer.style.display = "none";
+  downloadBtn.style.display = "none";
+  console.log(`[${new Date().toISOString()}] Sending request to: ${url}`);
+  for (let [key, value] of formData.entries()) {
+    console.log(`[${key}]:`, value instanceof File ? value.name : value);
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: {
+        'Accept': 'audio/wav'
+      }
+    });
+
+    console.log(`[${new Date().toISOString()}] Response status: ${res.status} ${res.statusText}`);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      throw new Error(`Voice generation failed: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('audio')) {
+      console.error("Invalid content type:", contentType);
+      throw new Error("Received non-audio response from server.");
+    }
+
+    const blob = await res.blob();
+    if (!blob || blob.size === 0) {
+      console.error("Empty or invalid audio blob received.");
+      throw new Error("Received empty or invalid audio file.");
+    }
+
+    console.log(`[${new Date().toISOString()}] Audio blob received, size: ${blob.size}, type: ${blob.type}`);
+    const audioUrl = URL.createObjectURL(blob);
+    console.log(`[${new Date().toISOString()}] Audio URL: ${audioUrl}`);
+
+    // Reset audio player
+    audioPlayer.src = '';
+    audioPlayer.src = audioUrl;
+    audioPlayer.style.display = "block";
+
+    // Force load and wait for audio metadata
+    await new Promise((resolve, reject) => {
+      audioPlayer.onloadedmetadata = () => {
+        console.log(`[${new Date().toISOString()}] Audio metadata loaded, duration: ${audioPlayer.duration}`);
+        resolve();
+      };
+      audioPlayer.onerror = () => {
+        console.error("Audio player error:", audioPlayer.error);
+        reject(new Error("Failed to load audio metadata."));
+      };
+      audioPlayer.load();
+    });
+
+    // Attempt to play audio
+    try {
+      await audioPlayer.play();
+      console.log(`[${new Date().toISOString()}] Audio playback started`);
+    } catch (err) {
+      console.warn("Autoplay blocked:", err);
+      showNotification("Tap play to listen to the generated voice.", "info");
+    }
+
+    downloadBtn.href = audioUrl;
+    downloadBtn.download = formData.get("outputFilename");
+    downloadBtn.style.display = "inline-block";
+    output.classList.remove("hidden");
+    showNotification("Voice cloned successfully!", "success");
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] Voice generation failed:`, error);
+    showNotification(`Failed to generate voice: ${error.message}`, "error");
+  } finally {
+    spinner.classList.add("hidden");
+    console.log(`[${new Date().toISOString()}] Spinner hidden`);
+  }
+});
+
+// Record button handler
+recordBtn.addEventListener("click", toggleRecording);
+
+// Notification function
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div");
+  notification.textContent = message;
+  notification.className = `notification ${type}`;
+  const icon = document.createElement("span");
+  icon.textContent = type === "error" ? "❌" : type === "success" ? "✅" : "ℹ️";
+  notification.prepend(icon);
+  document.body.appendChild(notification);
+  setTimeout(() => {
+    notification.style.opacity = "0";
+    notification.style.transform = "translateY(10px)";
+    notification.style.transition = "all 0.3s ease";
+    setTimeout(() => notification.remove(), 300);
+  }, 4000);
+}
+</script>
+</body>
+
+</html>

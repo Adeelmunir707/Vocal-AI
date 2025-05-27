@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocal AI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a class="logo" href="/">
+                    <img src="/logo/image.jpg" alt="Eleven Labs Logo">
+                    <span class="brand-name animate">Vocal Tunes</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#ai-audio">AI Audio</a></li>
+                    <li><a href="">Solutions</a></li>
+                    <li><a href="/templates/docs.html">Docs</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <a href="/templates/signin.html" class="btn-log">Login Page</a>
+                    <button class="menu-toggle" aria-label="Open menu">
+                        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke="currentColor" stroke-width="1.5" d="M2 6h20M2 12h20M2 18h20"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+    </header>
+    <section class="hero">
+        <h1 class="hero-title">Create the most realistic speech with our AI audio platform</h1>
+        <p>Pioneering research in Text to Speech, AI Voice Generator, and more</p>
+        <a href="/templates/playground.html" class="cta-button" id="explore-features">EXPLORE FEATURES</a>
+    </section>
+
+    <!-- Voice Cloning Interface -->
+    <div class="voice-container" id="voice-features">
+        <div class="nav-buttons-voice">
+            <button class="nav-btn-voice" data-section="text-to-speech">Text to Speech</button>
+            <button class="nav-btn-voice" data-section="speech-to-text">Speech to Text</button>
+            <button class="nav-btn-voice" data-section="voice-changer">Voice Changer</button>
+            <button class="nav-btn-voice" data-section="text-to-sfx">Text to SFX</button>
+            <button class="nav-btn-voice" data-section="voice-cloning">Voice Cloning</button>
+            <button class="nav-btn-voice" data-section="create-clone" id="create-clone-btn">
+                <a href="/templates/playground.html" style="text-decoration: none; color: inherit;">Create New Clone</a>
+            </button>
+        </div>
+
+        <div class="sections">
+            <div class="section text-to-speech-section" data-section="text-to-speech">
+                <h2>Text to Speech</h2>
+                <textarea id="tts-input" placeholder="Enter text here..."></textarea>
+                <div class="voice-selection">
+                    <button id="tts-male" class="voice-btn active">Alon (Male)</button>
+                    <button id="tts-female" class="voice-btn">Emma (Female)</button>
+                </div>
+                <div class="tts-controls">
+                    <button id="tts-submit">Generate</button>
+                    <button id="tts-play">Play</button>
+                    <button id="tts-download">Download</button>
+                </div>
+                <audio id="tts-audio" controls class="mt-2 hidden"></audio>
+                <div id="tts-status" class="status-message"></div>
+            </div>
+
+            <div class="section speech-to-text-section" data-section="speech-to-text">
+                <h2>Speech to Text</h2>
+                <button id="start-recording">Start Recording</button>
+                <textarea id="stt-output">Transcription will appear here...</textarea>
+            </div>
+            <div class="section voice-changer-section" data-section="voice-changer">
+                <div class="card">
+                    <div class="icons">
+                        <span class="icon">🎙️</span>
+                        <span class="icon">🎧</span>
+                        <span class="icon">🔊</span>
+                    </div>
+                    <p class="description">
+                        Enable mic access, record yourself reading some prompts and generate the sample in different
+                        voices
+                    </p>
+                    <div class="recording-controls">
+                        <button id="record-voice" class="btn btn-filled">
+                            <span class="mic-icon">🎙️</span> START RECORDING
+                        </button>
+                        <button id="stop-recording" class="btn btn-filled hidden">
+                            <span class="mic-icon">🛑</span> STOP RECORDING
+                        </button>
+                    </div>
+                    <p id="recording-status"></p>
+                    <audio id="recorded-audio" controls class="hidden"></audio>
+                    <div class="effect-controls hidden" id="effect-controls">
+                        <label for="voice-effect">Choose Effect:</label>
+                        <select id="voice-effect">
+                            <option value="robot">Robot</option>
+                            <option value="alien" selected>Alien</option>
+                        </select>
+                    </div>
+                    <button id="apply-voice" class="btn btn-filled hidden">APPLY EFFECT</button>
+                    <audio id="voice-changer-audio" controls class="hidden"></audio>
+                    <button id="download-voice" class="btn btn-outline hidden"
+                        style="display: block; margin-top: 10px;">
+                        ⬇️ DOWNLOAD TRANSFORMED VOICE
+                    </button>
+                </div>
+            </div>
+
+            <div class="section text-to-sfx-section" data-section="text-to-sfx">
+                <h2>Text-to-SFX</h2>
+                <input id="sfx-input" type="text" placeholder="Enter sound description">
+                <button id="sfx-submit" type="button">Generate SFX</button>
+                <audio id="sfx-audio" class="hidden" controls></audio>
+            </div>
+
+            <div class="section voice-cloning-section" data-section="voice-cloning">
+                <div class="voice-rows">
+                    <div class="row">
+                        <div class="profile original">
+                            <img src="/images/ik.png" alt="Imran Khan">
+                            <span>Imran Khan</span>
+                            <span>ORIGINAL</span>
+                        </div>
+                        <button class="play-btn" data-audio="/voices/ik.mp3">▶</button>
+                        <div class="profile clone">
+                            <div class="clone-icon" style="background: linear-gradient(45deg, #00ccff, #0099ff);"></div>
+                            <span> Imran Khan</span>
+                            <span>CLONED</span>
+                        </div>
+                        <button class="play-btn" data-audio="/voices/ik_cloned.wav">▶</button>
+                    </div>
+
+                    <div class="row">
+                        <div class="profile original">
+                            <img src="/images/obama.png" alt="Obama">
+                            <span>Barack Obama</span>
+                            <span>ORIGINAL</span>
+                        </div>
+                        <button class="play-btn" data-audio="/voices/obama.mp3">▶</button>
+                        <div class="profile clone">
+                            <div class="clone-icon" style="background: linear-gradient(45deg, #ff00cc, #cc00ff);"></div>
+                            <span>Barack Obama</span>
+                            <span>CLONED</span>
+                        </div>
+                        <button class="play-btn" data-audio="/voices/ob_cloned.wav">▶</button>
+                    </div>
+
+                    <div class="row">
+                        <div class="profile original">
+                            <img src="/images/melania.png" alt="Melania">
+                            <span>Melenia TrumpS</span>
+                            <span>ORIGINAL</span>
+                        </div>
+                        <button class="play-btn" data-audio="/voices/melania.mp3">▶</button>
+                        <div class="profile clone">
+                            <div class="clone-icon" style="background: linear-gradient(45deg, #ffcc00, #ff6600);"></div>
+                            <span> Melania</span>
+                            <span>CLONED</span>
+                        </div>
+                        <button class="play-btn" data-audio="/voices/melania_cloned.wav">▶</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="section create-clone-section hidden" data-section="create-clone">
+                <h2>Create New Voice Clone</h2>
+                <form id="clone-form">
+                    <input type="text" id="clone-name" placeholder="Clone Name" required>
+                    <input type="file" id="clone-audio" accept="audio/*" required>
+                    <button type="submit" id="submit-clone">Create Clone</button>
+                </form>
+                <p id="clone-message" class="mt-2 text-green-500 hidden"></p>
+            </div>
+        </div>
+    </div>
+
+    <section class="ai-agents-section">
+        <div class="ai-agents-text">
+            <h2>DEVELOPERS</h2>
+            <h2>Build AI Agents that speak</h2>
+            <p>Add voice to your agents on web, mobile or telephony in minutes. Our Conversational AI platform delivers
+                low latency, full configurability, and seamless scalability.</p>
+            <div class="ai-agents-buttons">
+                <button>Conversational AI</button>
+                <button>Contact Sales</button>
+            </div>
+        </div>
+        <div class="ai-agents-diagram">
+            <div class="workflow-container">
+                <div class="workflow-path"></div>
+                <div class="arrow">→</div>
+                <div class="connection-line agent-to-function-h"></div>
+                <div class="connection-line agent-to-function-v"></div>
+                <div class="node user">USER</div>
+                <div class="node speech-to-text"><span class="llm_icon black-icon">Aa</span>SPEECH TO TEXT</div>
+                <div class="node text-to-speech"><span class="llm_icon black-icon">🔊</span>TEXT TO SPEECH</div>
+                <div class="node agent">AGENT</div>
+                <div class="node llm"><span class="llm_icon">⚙</span> LLM</div>
+                <div class="node function-calling">FUNCTION CALLING</div>
+                <div class="node monitoring">MONITORING</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="developer-section">
+        <h2 class="developer-title">Meet Our Developers</h2>
+        <div class="developer-cards">
+            <div class="developer-card">
+                <img src="/images/hmd.jpg" alt="Developer 1 Profile" class="developer-img"
+                    onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+                <h3 class="developer-name">Hammad Nasir</h3>
+                <p class="developer-contact"><span>Phone:</span> 0334-8500674
+                </p>
+                <p class="developer-contact"><span>Email:</span>
+                    hammadnasir797@gmail.com</p>
+                <div class="developer-socials">
+                    <a href="https://github.com/Hammad112" target="_blank"
+                        onmouseover="this.style.transform='scale(1.1)';"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/hammadnasir112/" target="_blank"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://instagram.com/hammadnasir" target="_blank"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="developer-card">
+                <img src="/images/adeel.jpg" alt="Developer 2 Profile" class="developer-img"
+                    onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+                <h3 class="developer-name">Adeel Munir</h3>
+                <p class="developer-contact"><span>Phone:</span> 0316-5240457
+                </p>
+                <p class="developer-contact"><span>Email:</span>
+                    adeelmodernite@gmail.com</p>
+                <div class="developer-socials">
+                    <a href="https://github.com/Adeelmunir707" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/adeelmunir/" target="_blank"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/me_aadie?igsh=eWlwMWl1bzFscmVr" target="_blank"><i
+                            class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="developer-card">
+                <img src="/images/asif.jpeg" alt="Developer 3 Profile" class="developer-img"
+                    onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+                <h3 class="developer-name">Asif Shah</h3>
+                <p class="developer-contact"><span>Phone:</span> 0323-5183184
+                </p>
+                <p class="developer-contact"><span>Email:</span>
+                    asifhmed482@gmail.com</p>
+                <div class="developer-socials">
+                    <a href="https://github.com/dev4423" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/asif-iqbal-05657922b" target="_blank"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/shahasif_345?igsh=MTl4ZGtsOWxqd2czcw==" target="_blank"><i
+                            class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/templates/Terms.html">Terms</a> | <a href="/templates/privacy.html">Privacy</a> | <a
+                href="/templates/Contact.html">Contact</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="script2.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll(
+                '.brand-name, .nav-links, .nav-links a, .btn-log, .hero, .hero h1, .hero p, .hero .cta-button, ' +
+                '.voice-changer-section, .card, .icons, .icon, .description, .recording-controls, .btn, #recording-status, audio, ' +
+                '.effect-controls, .effect-controls label, .effect-controls select, .try-btn, .voice-container, .nav-buttons-voice, ' +
+                '.nav-btn-voice, .section, .row, .profile img, .profile span, .clone-icon, .play-btn, .section h2, textarea, button, ' +
+                'select, input[type="file"], input[type="text"], .voice-selection, .voice-btn, .tts-controls, .tts-controls button, ' +
+                '.status-message, .developer-section, .developer-title, .developer-cards, .developer-card, .developer-img, ' +
+                '.developer-name, .developer-contact, .developer-socials, .developer-socials a, .footer, .footer a'
+            );
+            elements.forEach(el => el.classList.add('animate'));
+        });</script>
+
+
+
+</body>
+
+</html>

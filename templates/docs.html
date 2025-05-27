@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vocal AI Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.8;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        header a {
+            color: #b8981b;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        header a:hover {
+            color: #d1d5db;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+            min-height: calc(100vh - 60px);
+            box-sizing: border-box;
+        }
+
+        .content h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .content h2 {
+            color: #ffffff;
+            font-size: 1.75rem;
+            font-weight: bold;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #b8981b;
+            padding-bottom: 0.5rem;
+        }
+
+        .content h3 {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .content p,
+        .content ul,
+        .content ol {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .content ul,
+        .content ol {
+            padding-left: 1.5rem;
+        }
+
+        .content ul {
+            list-style-type: disc;
+        }
+
+        .content ol {
+            list-style-type: decimal;
+        }
+
+        .content a {
+            color: #b8981b;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .content a:hover {
+            color: #d1d5db;
+        }
+
+        .content strong {
+            color: #ffffff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Vocal AI Documentation</h1>
+        <a href="/templates/index.html">Back to Home</a>
+    </header>
+
+    <div class="content">
+        <h1>Vocal AI Documentation</h1>
+
+        <h2>Overview</h2>
+        <p>
+            Vocal AI is a cutting-edge voice synthesis system developed by Hammad Nasir, Adeel Munir, and Muhammad Asif
+            Iqbal as part of their Bachelor of Science thesis at the University of Engineering and Technology, Peshawar,
+            Pakistan. This system leverages Large Language Models (LLMs) and advanced speech synthesis technologies to
+            generate realistic, context-aware, and emotionally expressive human voices in real time. By addressing key
+            challenges in voice synthesis—such as context insensitivity, real-time constraints, and voice
+            consistency—Vocal AI aims to revolutionize applications like virtual assistants, content creation, and
+            accessibility tools.
+        </p>
+        <p>
+            Our system integrates three core models: <strong>XTTS_v2</strong> for cross-lingual voice cloning,
+            <strong>Whisper</strong> for speech recognition, and <strong>LLaMA 8B</strong> for contextual text
+            processing. Together, they form a robust pipeline that produces natural, personalized, and dynamic synthetic
+            voices suitable for a wide range of practical uses.
+        </p>
+
+        <h2>Core Models</h2>
+
+        <h3>XTTS_v2: Cross-Lingual Voice Cloning</h3>
+        <p><strong>What It Does</strong>: XTTS_v2, developed by Coqui AI, is a transformer-based text-to-speech (TTS)
+            model designed for high-quality voice cloning with minimal training data (3-10 seconds of reference audio).
+            It excels in cross-lingual synthesis, supporting 17 languages while preserving speaker identity.</p>
+        <p><strong>Key Features</strong>:</p>
+        <ul>
+            <li><strong>Multi-Scale Encoder</strong>: Processes text at phoneme, syllable, and word levels to capture
+                hierarchical speech patterns.</li>
+            <li><strong>Speaker Embedding Module</strong>: Extracts unique voice characteristics from reference audio.
+            </li>
+            <li><strong>Cross-Attention Mechanism</strong>: Aligns text features with speaker embeddings for consistent
+                voice identity.</li>
+            <li><strong>Neural Vocoder</strong>: Converts spectral representations into high-fidelity waveforms with
+                natural prosody.</li>
+        </ul>
+        <p><strong>Why We Chose It</strong>:</p>
+        <ul>
+            <li>Superior cross-lingual performance, outperforming models like HierSpeech++ and Mega-TTS 2 in listener
+                preference tests (CMOS: 0.41 ± 0.26 vs HierSpeech++, 0.92 ± 0.22 vs Mega-TTS 2).</li>
+            <li>Requires minimal training data, making it efficient for experimentation.</li>
+            <li>Preserves emotional tone, enhancing the naturalness of synthesized speech.</li>
+        </ul>
+        <p><strong>Limitations</strong>:</p>
+        <ul>
+            <li>Speaker similarity (SMOS: -0.31 ± 0.36 vs HierSpeech++) can vary, indicating room for improvement in
+                voice identity preservation.</li>
+        </ul>
+
+        <h3>Whisper: Speech Recognition</h3>
+        <p><strong>What It Does</strong>: Whisper, developed by OpenAI, is a transformer-based automatic speech
+            recognition (ASR) model that converts audio into accurate text, supporting multilingual inputs and
+            performing well in noisy environments.</p>
+        <p><strong>Key Features</strong>:</p>
+        <ul>
+            <li><strong>Audio Preprocessing</strong>: Converts raw audio into mel-spectrograms with adaptive
+                normalization.</li>
+            <li><strong>Transformer Encoder-Decoder</strong>: Processes spectral features and generates textual output.
+            </li>
+            <li><strong>Multilingual Support</strong>: Automatically detects and transcribes speech across diverse
+                languages.</li>
+        </ul>
+        <p><strong>Role in Vocal AI</strong>:</p>
+        <ul>
+            <li>Provides high-fidelity transcription (word error rates below 5% in noisy conditions).</li>
+            <li>Identifies input languages for cross-lingual synthesis.</li>
+            <li>Preprocesses audio for TTS by generating clean text inputs.</li>
+            <li>Assists in quality assessment by transcribing synthesized speech for comparison.</li>
+        </ul>
+        <p><strong>Why We Chose It</strong>:</p>
+        <ul>
+            <li>Robust performance in challenging acoustic environments.</li>
+            <li>Seamless integration into our multilingual pipeline.</li>
+        </ul>
+
+        <h3>LLaMA 8B: Contextual Text Processing</h3>
+        <p><strong>What It Does</strong>: LLaMA 8B, a large language model with 8 billion parameters, enhances text
+            analysis by providing deep contextual understanding, enabling more natural and expressive speech synthesis.
+        </p>
+        <p><strong>Key Features</strong>:</p>
+        <ul>
+            <li><strong>Context-Aware Preprocessing</strong>: Analyzes text for semantic structure, emotional valence,
+                and linguistic patterns.</li>
+            <li><strong>Phoneme-Level Alignment</strong>: Maps text to phonetic representations for speech synthesis.
+            </li>
+            <li><strong>Prosody Prediction</strong>: Generates timing, emphasis, and intonation markers.</li>
+            <li><strong>Sentiment Identification</strong>: Extracts emotional cues to inform voice modulation.</li>
+        </ul>
+        <p><strong>Role in Vocal AI</strong>:</p>
+        <ul>
+            <li>Improves naturalness by 23% through better rhythm and intonation.</li>
+            <li>Enhances cross-lingual transfer by mapping prosodic characteristics.</li>
+            <li>Enables emotion-aware synthesis for expressive speech.</li>
+            <li>Maintains coherence in longer speech segments.</li>
+        </ul>
+        <p><strong>Why We Chose It</strong>:</p>
+        <ul>
+            <li>Its ability to process extended discourse (context window of 2048 tokens) ensures semantic consistency.
+            </li>
+            <li>Fine-tuning on phonetically balanced texts optimizes it for speech synthesis.</li>
+        </ul>
+
+        <h2>Integrated Pipeline</h2>
+        <p>
+            Vocal AI combines XTTS_v2, Whisper, and LLaMA 8B into a seamless pipeline designed for efficiency and
+            quality:
+        </p>
+        <ol>
+            <li><strong>Input Processing</strong>: LLaMA 8B analyzes text inputs for linguistic structure, sentiment,
+                and context, preparing them for synthesis.</li>
+            <li><strong>Voice Reference Processing</strong>: Whisper transcribes reference audio and extracts speaker
+                characteristics, which are used to create speaker embeddings.</li>
+            <li><strong>Synthesis Optimization</strong>: XTTS_v2 generates speech using the processed text and speaker
+                embeddings, with feedback loops for parameter tuning.</li>
+            <li><strong>Quality Assessment</strong>: The system evaluates output speech through objective metrics (e.g.,
+                Mean Opinion Score: 4.2 for naturalness, 4.0 for context sensitivity) and subjective listening tests,
+                refining the synthesis process.</li>
+        </ol>
+        <p>
+            This pipeline addresses limitations of standalone TTS systems by incorporating deep contextual
+            understanding, real-time optimization, and personalized voice cloning.
+        </p>
+
+        <h2>Applications</h2>
+        <p>Vocal AI has a wide range of practical applications:</p>
+        <ul>
+            <li><strong>Virtual Assistants</strong>: Enables more intuitive, context-aware interactions for customer
+                support, healthcare, and home automation.</li>
+            <li><strong>Content Creation</strong>: Allows creators to produce dynamic, engaging audio content with
+                personalized voices.</li>
+            <li><strong>Accessibility Tools</strong>: Improves assistive devices for individuals with speech impairments
+                by providing natural, responsive synthetic voices.</li>
+        </ul>
+
+        <h2>Performance Metrics</h2>
+        <p>Our system was rigorously evaluated:</p>
+        <ul>
+            <li><strong>Naturalness</strong>: Achieved a Mean Opinion Score (MOS) of 4.2, surpassing existing
+                state-of-the-art systems.</li>
+            <li><strong>Context-Sensitive Synthesis</strong>: Scored 4.0 on context awareness, demonstrating significant
+                improvement over traditional models.</li>
+            <li><strong>Real-Time Capability</strong>: Optimized for low-latency synthesis, making it suitable for
+                interactive applications.</li>
+        </ul>
+
+        <h2>Future Work</h2>
+        <p>While Vocal AI marks a significant advancement, there are areas for improvement:</p>
+        <ul>
+            <li>Enhancing speaker similarity in cross-lingual synthesis.</li>
+            <li>Further reducing inference time for resource-constrained environments.</li>
+            <li>Developing ethical frameworks to address privacy and misuse concerns in voice cloning.</li>
+        </ul>
+
+        <h2>Get Involved</h2>
+        <p>
+            Interested in exploring Vocal AI? Contact us at <a
+                href="mailto:hammadnasir797@gmail.com">hammadnasir797@gmail.com</a> to learn more about integration,
+            collaboration, or further development opportunities.
+        </p>
+    </div>
+</body>
+
+</html>
