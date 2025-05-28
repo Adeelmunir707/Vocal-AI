@@ -1,27 +1,27 @@
-# Use a base image with Python (you can replace this with a different version if needed)
-FROM python:3.9-slim
+# Use the official Python 3.11 image (based on Debian/Ubuntu)
+FROM python:3.11-slim
 
-# Install git (needed to clone repositories)
-RUN apt-get update && apt-get install -y git
+# Install system dependencies (including PortAudio for sounddevice)
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    portaudio19-dev \
+    build-essential \
+    git \
+    && apt-get clean
 
-# Set work directory
+# Set the working directory
 WORKDIR /app
 
-# Copy the requirements file
-COPY requirements.txt /app/
-
-# Install Python dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
+# Copy application files into the container
 COPY . /app/
 
-# Set environment variables (optional)
-ENV PYTHONUNBUFFERED=1
+# Install Python dependencies from requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Expose necessary ports (if needed)
+# Expose the port for FastAPI
 EXPOSE 8000
 
-# Command to run the application
-CMD ["python", "app.py"]
+# Run the FastAPI app with Uvicorn
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+ 

@@ -28,7 +28,9 @@ import librosa  # Added missing import
 from TTS.api import TTS
 import torch
 from TTS.tts.models.xtts import XttsArgs
+import os
 
+os.environ["COQUI_TOS_AGREED"] = "1"
 app = FastAPI()
 
 # CORS middleware
